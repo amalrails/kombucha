@@ -1,0 +1,106 @@
+---
+
+white_tea:
+  name: White Tea
+  base: true
+  caffeine_free: true
+  vegan: true
+  kombuchas: breathyzer
+
+black_tea:
+  name: Black Tea
+  base: true
+  caffeine_free: false
+  vegan: true
+  kombuchas: guinny_pop
+
+green_tea:
+  name: Green Tea
+  base: true
+  caffeine_free: false
+  vegan: true
+  kombuchas: wobbly_pop
+
+oolong_tea:
+  name: Oolong Tea
+  base: true
+  caffeine_free: false
+  vegan: true
+  kombuchas: pork_pop
+
+vanilla:
+  name: Vanilla
+  base: false
+  caffeine_free: true
+  vegan: true
+  kombuchas: guinny_pop, wobbly_pop
+
+ginger:
+  name: Ginger
+  base: false
+  caffeine_free: true
+  vegan: true
+  kombuchas: breathyzer, wobbly_pop
+
+spearmint:
+  name: Spearmint
+  base: false
+  caffeine_free: true
+  vegan: true
+  kombuchas: breathyzer
+
+peppermint:
+  name: 'Peppermint'
+  base: false
+  caffeine_free: true
+  vegan: true
+  kombuchas: breathyzer
+
+rose_petal:
+  name: Rose Petal
+  base: false
+  caffeine_free: true
+  vegan: true
+  kombuchas: guinny_pop
+
+chocolate:
+  name: Chocolate
+  base: false
+  caffeine_free: false
+  vegan: true
+  kombuchas: dark_and_stormy
+
+mandarin_orange:
+  name: Mandorin Orange
+  base: false
+  caffeine_free: false
+  vegan: true
+  kombuchas: guinny_pop, dark_and_stormy
+
+bacon:
+  name: Bacon
+  base: false
+  caffeine_free: true
+  vegan: false
+  kombuchas: pork_pop
+
+sausage:
+  name: Sausage
+  base: false
+  caffeine_free: true
+  vegan: false
+  kombuchas: pork_pop
+
+ham:
+  name: Ham
+  base: false
+  caffeine_free: true
+  vegan: false
+  kombuchas: pork_pop
+
+beer:
+  name: Beer
+  base: false
+  caffeine_free: true
+  vegan: true
+  kombuchas: wobbly_pop

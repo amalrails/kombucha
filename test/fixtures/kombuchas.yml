@@ -1,0 +1,26 @@
+---
+
+guinny_pop:
+  name: Guinny Pop
+  fizziness_level: low
+  ingredients: black_tea, vanilla, mandarin_orange, rose_petal
+
+pork_pop:
+  name: Pork Pop
+  fizziness_level: medium
+  ingredients: oolong_tea, bacon, sausage, ham
+
+breathyzer:
+  name: Breathalyzer
+  fizziness_level: medium
+  ingredients: white_tea, spearmint, peppermint, ginger
+
+wobbly_pop:
+  name: Wobbly Pop
+  fizziness_level: high
+  ingredients: green_tea, beer, ginger, vanilla
+
+dark_and_stormy:
+  name: Dark & Stormy
+  fizziness_level: medium
+  ingredients: black_tea, ginger, chocolate, mandarin_orange
