@@ -6,11 +6,6 @@ describe Api::KombuchasController, type: :request do
   let(:response_body) { JSON.parse(response.body) }
   let(:current_user) { create(:user) }
   let(:headers) { { 'USER_ID': current_user.id } }
-  let(:create_kombuchas) do
-    %w(low medium high).map do |fizz|
-      create(:kombucha, fizziness_level: fizz, vegan: true, caffeine_free: true)
-    end
-  end
 
   describe "#index" do
     context 'Unfiltered collection:' do

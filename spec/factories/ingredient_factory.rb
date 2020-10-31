@@ -2,8 +2,8 @@
 
 FactoryBot.define do
   factory :ingredient, class: Ingredient do
-    sequence(:name) { |n| "sample ingredient #{n}" }
-    base { true }
+    name { Faker::Food.unique.ingredient }
+    base { false }
     caffeine_free { false }
     vegan { false }
 

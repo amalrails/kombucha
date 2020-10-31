@@ -5,7 +5,6 @@ FactoryBot.define do
     sequence(:name) { |n| "sample kombucha #{n}" }
     fizziness_level { "low" }
     transient do
-      ingredient_name { Faker::Food.ingredient }
       vegan { false }
       caffeine_free { false }
     end
@@ -23,9 +22,17 @@ FactoryBot.define do
     end
 
     after(:build) do |kombucha, evaluator|
-      kombucha.ingredients = build_list(:ingredient, 3, name: evaluator.ingredient_name,
-                                        vegan: evaluator.vegan,
-                                        caffeine_free: evaluator.caffeine_free)
+      ind = 0
+      ingredients = build_list(:ingredient, 5) do |ingredient|
+        ingredient.base = ind.eql?(1) ? true : false
+        ind += 1
+      end
+      ind = 0
+      kombucha.recipe_items = build_list(:recipe_item, 5) do |recipe|
+        recipe.kombucha = kombucha
+        recipe.ingredient = ingredients[ind]
+        ind += 1
+      end
     end
   end
 end

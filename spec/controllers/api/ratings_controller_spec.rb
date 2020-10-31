@@ -94,7 +94,6 @@ describe Api::RatingsController, type: :request do
 
     it "updates rating" do
       rating = create(:rating, score: 3.5, user_id: current_user.id, kombucha_id: kombucha1.id)
-
       patch "/api/ratings/#{rating.id}", params: valid_request_params, headers: headers
 
       expect(response.message).to eq("OK")
@@ -103,9 +102,7 @@ describe Api::RatingsController, type: :request do
     end
 
     it "does not update rating if score is invalid" do
-
       rating = create(:rating, score: 3.5, user_id: current_user.id, kombucha_id: kombucha2.id)
-
       patch "/api/ratings/#{rating.id}", params: invalid_request_params, headers: headers
 
       expect(response.message).to eq("Unprocessable Entity")

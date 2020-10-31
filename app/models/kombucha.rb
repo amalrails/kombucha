@@ -9,10 +9,19 @@ class Kombucha < ApplicationRecord
   validates :fizziness_level, inclusion: { in: %w( high medium low ) }
 
   scope :filter_by_fizziness, -> (fizziness) { where fizziness_level: fizziness }
-  scope :filter_by_vegan, -> (vegan) { includes(:ingredients)
+  scope :filter_by_vegan, -> (vegan) { includes(:ingredients).references(:ingredients)
                                        .where(ingredients: { vegan: vegan }) }
-  scope :filter_by_caffeine_free, -> (caffeine) { includes(:ingredients)
+  scope :filter_by_caffeine_free, -> (caffeine) { includes(:ingredients).references(:ingredients)
                                                   .where(ingredients: { vegan: caffeine }) }
+  scope :with_different_tea_base, -> { includes(:ingredients).references(:ingredients)
+                                                             .select('distinct *')
+                                                             .where(ingredients: { base: true }) }
+  scope :random_order, -> { order(Arel.sql("RANDOM()")) }
+  scope :filter_by_recipe_name, -> (recipe_name) {  includes(:ingredients).references(:ingredients)
+                                                    .where(ingredients: { name: recipe_name }) }
+  scope :filter_by_avg_rating, -> (avg_rating) { includes(:ratings).references(:ratings)
+                                                 .where('score > ?', avg_rating) }
+
 
   def to_h
     {
