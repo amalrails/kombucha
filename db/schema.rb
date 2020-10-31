@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180315222214) do
+ActiveRecord::Schema.define(version: 2020_10_31_033051) do
 
   create_table "ingredients", force: :cascade do |t|
     t.string "name"
@@ -24,6 +24,16 @@ ActiveRecord::Schema.define(version: 20180315222214) do
   create_table "kombuchas", force: :cascade do |t|
     t.string "name"
     t.string "fizziness_level"
+  end
+
+  create_table "ratings", force: :cascade do |t|
+    t.decimal "score"
+    t.integer "kombucha_id"
+    t.integer "user_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["kombucha_id"], name: "index_ratings_on_kombucha_id"
+    t.index ["user_id"], name: "index_ratings_on_user_id"
   end
 
   create_table "recipe_items", force: :cascade do |t|

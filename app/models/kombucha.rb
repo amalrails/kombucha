@@ -3,6 +3,7 @@
 class Kombucha < ApplicationRecord
   has_many :recipe_items
   has_many :ingredients, through: :recipe_items
+  has_many :ratings
 
   validates :name, presence: true
   validates :fizziness_level, inclusion: { in: %w( high medium low ) }
