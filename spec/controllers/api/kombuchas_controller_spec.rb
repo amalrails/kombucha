@@ -6,15 +6,82 @@ describe Api::KombuchasController, type: :request do
   let(:response_body) { JSON.parse(response.body) }
   let(:current_user) { create(:user) }
   let(:headers) { { 'USER_ID': current_user.id } }
+  let(:create_kombuchas) do
+    %w(low medium high).map do |fizz|
+      create(:kombucha, fizziness_level: fizz, vegan: true, caffeine_free: true)
+    end
+  end
 
   describe "#index" do
-    it "renders a collection of kombuchas" do
-      create_list(:kombucha, 5)
+    context 'Unfiltered collection:' do
+      before do
+        create_list(:kombucha, 5)
+      end
 
-      get '/api/kombuchas', params: {}, headers: headers
+      it "renders a collection of kombuchas" do
+        get '/api/kombuchas', params: {}, headers: headers
 
-      expect(response.status).to eq(200)
-      expect(response_body.length).to eq(Kombucha.count)
+        expect(response.status).to eq(200)
+        expect(response_body.length).to eq(Kombucha.count)
+      end
+    end
+
+    context 'Filtered collection:' do
+      before(:all) do
+        %w(low medium high).map do |fizz|
+          create_list(:kombucha, 3, fizziness_level: fizz, vegan: true, caffeine_free: true)
+        end
+      end
+
+      context 'Params of fizziness is provided:' do
+        let(:kombucha_count) { Kombucha.where(fizziness_level: 'high').count }
+
+        it "renders a collection of kombuchas, which are filtered based on the fizziness param value" do
+          get '/api/kombuchas', params: { 'fizziness': 'high' }, headers: headers
+
+          expect(response.status).to eq(200)
+          expect(response_body.length).to eq(kombucha_count)
+        end
+      end
+
+      context 'Params of vegan is provided:' do
+        let(:kombucha_count) { Kombucha.includes(:ingredients)
+                                       .where(ingredients: { vegan: 'true' }).count }
+
+        it "renders a collection of kombuchas, which are filtered based on the vegan param value" do
+          get '/api/kombuchas', params: { 'vegan': 'true' }, headers: headers
+
+          expect(response.status).to eq(200)
+          expect(response_body.length).to eq(kombucha_count)
+        end
+      end
+
+      context 'Params of vegan and caffeine_free is provided:' do
+        let(:kombucha_count) { Kombucha.includes(:ingredients)
+                                       .where(ingredients: { vegan: true,
+                                                             caffeine_free: true }).count }
+
+        it "renders a collection of kombuchas, which are filtered based on the vegan, fizziness and caffeine_free params value" do
+          get '/api/kombuchas', params: { 'vegan': 'true', 'caffeine_free': 'true' }, headers: headers
+
+          expect(response.status).to eq(200)
+          expect(response_body.length).to eq(kombucha_count)
+        end
+      end
+
+      context 'Params of vegan, fizziness and caffeine_free is provided:' do
+        let(:kombucha_count) { Kombucha.where(fizziness_level: 'high')
+                                       .includes(:ingredients)
+                                       .where(ingredients: { vegan: true,
+                                                             caffeine_free: true }).count }
+
+        it "renders a collection of kombuchas, which are filtered based on the vegan, fizziness and caffeine_free params value" do
+          get '/api/kombuchas', params: { 'fizziness': 'high', 'vegan': 'true', 'caffeine_free': 'true' }, headers: headers
+
+          expect(response.status).to eq(200)
+          expect(response_body.length).to eq(kombucha_count)
+        end
+      end
     end
   end
 

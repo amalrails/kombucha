@@ -6,6 +6,10 @@ class Api::KombuchasController < ApiController
 
   def index
     @kombuchas = Kombucha.all
+    filtering_params(params).each do |key, value|
+      @kombuchas = @kombuchas.public_send("filter_by_#{key}", value) if value.present?
+    end
+
     render json: @kombuchas.map(&:to_h), status: :ok
   end
 
@@ -37,6 +41,11 @@ class Api::KombuchasController < ApiController
     end
 
     def kombucha_params
-      params.require(:kombucha).permit(:name, :fizziness_level)
+      params.require(:kombucha).permit(:name, :fizziness_level,
+                                       ingredient: [:caffeine_free, :vegan])
+    end
+
+    def filtering_params(params)
+      params.slice(:fizziness, :caffeine_free, :vegan)
     end
 end
