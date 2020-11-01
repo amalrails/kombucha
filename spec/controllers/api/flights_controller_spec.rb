@@ -16,7 +16,7 @@ RSpec.describe Api::FlightsController, type: :request do
         expect { post "/api/flights", params: {}, headers: headers }.to change(Flight, :count).by(1)
         expect(response_body["id"]).to eq(Flight.last.id)
         expect(response_body["list"].size).to eq(Flight.last.list.size)
-        expect(response_body["list"].uniq).to eq(Flight.last.list)
+        expect(response_body["list"].uniq).to eq(Flight.last.list.uniq)
       end
     end
 
@@ -39,19 +39,18 @@ RSpec.describe Api::FlightsController, type: :request do
           end
         end
         let(:recipe_name) { common_ingredient.name }
-        let(:kombucha_count) { Kombucha.where(fizziness_level: 'high').count }
+        let(:kom) { create(:kombucha, name: 'sample_kom', vegan: true, caffeine_free: true) }
+
 
         it "creates a flight of kombuchas, based on given the recipe_name_param value" do
           new_kombuchas
-          post '/api/flights', params: { 'recipe_name': recipe_name }, headers: headers
+          post '/api/flights', params: { 'recipe_name': kom.name }, headers: headers
           expect { post "/api/flights", params: {}, headers: headers }.to change(Flight, :count).by(1)
           expect(response.status).to eq(200)
           expect(response_body["id"]).to eq(Flight.last.id)
-          expect(response_body["list"].size).to eq(Flight.last.list.size)
+          expect(response_body["list"].uniq).to eq(Flight.last.list.uniq)
           @kombuchas = Kombucha.where(id: response_body["list"])
-          @kombuchas.each do |kom|
-            expect(kom.ingredients.pluck(:name).include?(recipe_name))
-          end
+          expect(@kombuchas.pluck(:name).include?(kom.name))
         end
       end
 
@@ -74,15 +73,14 @@ RSpec.describe Api::FlightsController, type: :request do
           end
         end
         let(:recipe_name) { common_ingredient.name }
-        let(:kombucha_count) { Kombucha.where(fizziness_level: 'high').count }
         let(:rating) { 3 }
 
-        it "creates a flight of kombuchas, based on given the recipe_name_param value" do
+        it "creates a flight of kombuchas, based on given the avg_rating_param value" do
           new_kombuchas
           post '/api/flights', params: { 'avg_rating': rating }, headers: headers
           expect(response.status).to eq(200)
           expect(response_body["id"]).to eq(Flight.last.id)
-          expect(response_body["list"].size).to eq(Flight.last.list.size)
+          expect(response_body["list"].uniq).to eq(Flight.last.list.uniq)
           @kombuchas = Kombucha.where(id: response_body["list"])
           @kombuchas.each do |kom|
             expect(kom.ratings.pluck(:score).map { |score| score > rating }).to eq([true])
@@ -109,19 +107,20 @@ RSpec.describe Api::FlightsController, type: :request do
           end
         end
         let(:recipe_name) { common_ingredient.name }
-        let(:kombucha_count) { Kombucha.where(fizziness_level: 'high').count }
+        let(:kom) { create(:kombucha, name: 'sample_kom', vegan: true, caffeine_free: true) }
+        let(:kom_rating) { create(:rating, score: 3.5, user_id: current_user.id, kombucha_id: kom.id) }
+
         let(:rating) { 3 }
 
         it "creates a flight of kombuchas, based on given the recipe_name_param value" do
           new_kombuchas
-          post '/api/flights', params: { 'recipe_name': recipe_name, 'avg_rating': rating }, headers: headers
+          kom_rating
+          post '/api/flights', params: { 'recipe_name': kom.name, 'avg_rating': rating }, headers: headers
           expect(response.status).to eq(200)
           expect(response_body["id"]).to eq(Flight.last.id)
-          expect(response_body["list"].size).to eq(Flight.last.list.size)
+          expect(response_body["list"].uniq).to eq(Flight.last.list.uniq)
           @kombuchas = Kombucha.where(id: response_body["list"])
-          @kombuchas.each do |kom|
-            expect(kom.ingredients.pluck(:name).include?(recipe_name))
-          end
+          expect(@kombuchas.pluck(:name).include?(kom.name))
           @kombuchas.each do |kom|
             expect(kom.ratings.pluck(:score).map { |score| score > rating }).to eq([true])
           end

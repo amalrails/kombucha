@@ -77,6 +77,33 @@ describe Api::KombuchasController, type: :request do
           expect(response_body.length).to eq(kombucha_count)
         end
       end
+
+      context 'Params of ingredient_name is provided:' do
+        let(:kom) { create(:kombucha, name: 'sample', fizziness_level: 'low', vegan: true, caffeine_free: true) }
+        let(:ing_name) { kom.ingredients.first.name }
+        let(:kombucha_count) { Kombucha.includes(:ingredients).where(ingredients: { name: ing_name }).count }
+
+        it "renders a collection of kombuchas, which are filtered based on the ingredient provided" do
+          get '/api/kombuchas', params: { ingredient_name: ing_name }, headers: headers
+
+          expect(response.status).to eq(200)
+          expect(response_body.length).to eq(kombucha_count)
+        end
+      end
+
+      context 'Params of excluded ingredient_name is provided:' do
+        let(:kom) { create(:kombucha, name: 'sample', fizziness_level: 'low', vegan: true, caffeine_free: true) }
+        let(:exc_ing_name) { kom.ingredients.first.name }
+        let(:kombucha_count) { Kombucha.includes(:ingredients).references(:ingredients).where.not(ingredients: { name: exc_ing_name }).count }
+
+        it "renders a collection of kombuchas, which are filtered by excluding the given ingredient" do
+          get '/api/kombuchas', params: { exclude_ingredient_name: exc_ing_name }, headers: headers
+
+          expect(response.status).to eq(200)
+          expect(response_body.length).to eq(kombucha_count)
+        end
+      end
+
     end
   end
 
