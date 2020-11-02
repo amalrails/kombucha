@@ -18,13 +18,16 @@ class Kombucha < ApplicationRecord
                                                              .where(ingredients: { base: true }) }
   scope :random_order, -> { order(Arel.sql("RANDOM()")) }
   scope :filter_by_recipe_name, -> (recipe_name) { where(name: recipe_name) }
-  scope :filter_by_ingredient_name, -> (ingredient_name) {  includes(:ingredients).references(:ingredients)
-                                                            .where(ingredients: { name: ingredient_name }) }
+  scope :filter_by_ingredient, -> (ingredient_name) {  includes(:ingredients)
+                                                       .references(:ingredients)
+                                                       .where(ingredients: { name: ingredient_name }) }
   scope :filter_by_avg_rating, -> (avg_rating) { includes(:ratings).references(:ratings)
                                                  .where('score > ?', avg_rating) }
 
-  scope :exclude_ingredient_name, -> (ex_ing_name) { includes(:ingredients).references(:ingredients)
-                                                    .where.not(ingredients: { name: ex_ing_name }) }
+  scope :filter_by_excluded_ingredient, -> (ex_ing_name) { includes(:ingredients)
+                                                           .references(:ingredients)
+                                                           .where
+                                                           .not(ingredients: { name: ex_ing_name }) }
 
 
   def to_h

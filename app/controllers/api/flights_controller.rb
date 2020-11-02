@@ -10,17 +10,21 @@ class Api::FlightsController < ApiController
 
   def create
     @kombuchas = Kombucha.with_different_tea_base
-    filtering_params(params).each do |key, value|
-      @kombuchas = @kombuchas.where(id: Kombucha.public_send("filter_by_#{key}", value).pluck(:id)) if value.present?
-    end
-    kombucha_ids = if params[:recipe_name]
-      kom_recipe_id = @kombuchas.filter_by_recipe_name(params[:recipe_name]).last.id
-      (@kombuchas.where.not(id: [kom_recipe_id]).random_order.limit(3).pluck(:id) << kom_recipe_id)
-    else
-      @kombuchas.random_order.limit(4).pluck(:id)
-    end
 
-    @flight = Flight.new(list: kombucha_ids)
+    filtering_params(params).each do |key, value|
+      if value.present?
+        if key.eql?('recipe_name')
+          kom_recipe = @kombuchas.filter_by_recipe_name(params[:recipe_name]).last
+          @kombuchas = @kombuchas.where
+                                 .not(id: [kom_recipe.id])
+                                 .random_order
+                                 .limit(3) << kom_recipe
+        else
+          @kombuchas = @kombuchas.where(id: Kombucha.public_send("filter_by_#{key}", value).pluck(:id))
+        end
+      end
+    end
+    @flight = Flight.new(list: @kombuchas.random_order.limit(4).pluck(:id))
 
     if @flight.save
       render json: @flight

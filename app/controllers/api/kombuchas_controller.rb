@@ -46,6 +46,6 @@ class Api::KombuchasController < ApiController
     end
 
     def filtering_params(params)
-      params.slice(:fizziness, :caffeine_free, :vegan, :ingredient_name, :exlude_ingredient_name)
+      params.slice(:fizziness, :caffeine_free, :vegan, :ingredient, :exluded_ingredient)
     end
 end

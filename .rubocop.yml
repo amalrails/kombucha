@@ -8,6 +8,7 @@ AllCops:
     - 'db/schema.rb'
     - 'db/data_schema.rb'
     - vendor/bundle/**/*
+    - spec/**/*
 
 # Prefer &&/|| over and/or.
 Style/AndOr:
@@ -130,4 +131,52 @@ Style/Semicolon:
 
 # Checks if you assign a variable but don't use it anywhere.
 Lint/UselessAssignment:
+  Enabled: true
+
+#################### Metrics ################################
+
+Metrics/AbcSize:
+  Description: >-
+                 A calculated magnitude based on number of assignments,
+                 branches, and conditions.
+  Enabled: false
+
+Metrics/BlockNesting:
+  Description: 'Avoid excessive block nesting'
+  StyleGuide: 'https://github.com/bbatsov/ruby-style-guide#three-is-the-number-thou-shalt-count'
+  Enabled: true
+
+Metrics/ClassLength:
+  Description: 'Avoid classes longer than 100 lines of code.'
+  Enabled: true
+  Max: 100
+
+Metrics/CyclomaticComplexity:
+  Description: >-
+                 A complexity metric that is strongly correlated to the number
+                 of test cases needed to validate a method.
+  Enabled: true
+
+Metrics/LineLength:
+  Max: 110
+  Description: 'Limit lines to 100 characters.'
+  StyleGuide: 'https://github.com/bbatsov/ruby-style-guide#80-character-limits'
+  Enabled: true
+
+Metrics/MethodLength:
+  Description: 'Avoid methods longer than 12 lines of code.'
+  StyleGuide: 'https://github.com/bbatsov/ruby-style-guide#short-methods'
+  Enabled: false
+  Max: 15
+  CountComments: false
+
+Metrics/ParameterLists:
+  Description: 'Avoid parameter lists longer than three or four parameters.'
+  StyleGuide: 'https://github.com/bbatsov/ruby-style-guide#too-many-params'
+  Enabled: true
+
+Metrics/PerceivedComplexity:
+  Description: >-
+                 A complexity metric geared towards measuring complexity for a
+                 human reader.
   Enabled: true

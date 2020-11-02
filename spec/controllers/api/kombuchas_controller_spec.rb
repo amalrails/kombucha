@@ -28,10 +28,10 @@ describe Api::KombuchasController, type: :request do
         end
       end
 
-      context 'Params of fizziness is provided:' do
+      context 'Filter by fizziness:' do
         let(:kombucha_count) { Kombucha.where(fizziness_level: 'high').count }
 
-        it "renders a collection of kombuchas, which are filtered based on the fizziness param value" do
+        it "renders a collection of kombuchas, which are filtered based on the given fizziness value" do
           get '/api/kombuchas', params: { 'fizziness': 'high' }, headers: headers
 
           expect(response.status).to eq(200)
@@ -39,11 +39,11 @@ describe Api::KombuchasController, type: :request do
         end
       end
 
-      context 'Params of vegan is provided:' do
+      context 'Filter by vegan:' do
         let(:kombucha_count) { Kombucha.includes(:ingredients)
                                        .where(ingredients: { vegan: 'true' }).count }
 
-        it "renders a collection of kombuchas, which are filtered based on the vegan param value" do
+        it "renders a collection of kombuchas, which are filtered based on the given vegan value" do
           get '/api/kombuchas', params: { 'vegan': 'true' }, headers: headers
 
           expect(response.status).to eq(200)
@@ -51,12 +51,13 @@ describe Api::KombuchasController, type: :request do
         end
       end
 
-      context 'Params of vegan and caffeine_free is provided:' do
+      context 'Filter by vegan and caffeine_free:' do
         let(:kombucha_count) { Kombucha.includes(:ingredients)
                                        .where(ingredients: { vegan: true,
                                                              caffeine_free: true }).count }
 
-        it "renders a collection of kombuchas, which are filtered based on the vegan, fizziness and caffeine_free params value" do
+        it "renders a collection of kombuchas, which are filtered based on the given vegan,
+              fizziness and caffeine_free value" do
           get '/api/kombuchas', params: { 'vegan': 'true', 'caffeine_free': 'true' }, headers: headers
 
           expect(response.status).to eq(200)
@@ -64,13 +65,13 @@ describe Api::KombuchasController, type: :request do
         end
       end
 
-      context 'Params of vegan, fizziness and caffeine_free is provided:' do
+      context 'Filter by vegan, fizziness and caffeine_free:' do
         let(:kombucha_count) { Kombucha.where(fizziness_level: 'high')
                                        .includes(:ingredients)
                                        .where(ingredients: { vegan: true,
                                                              caffeine_free: true }).count }
 
-        it "renders a collection of kombuchas, which are filtered based on the vegan, fizziness and caffeine_free params value" do
+        it "renders a collection of kombuchas, which are filtered based on the given vegan, fizziness and caffeine_free value" do
           get '/api/kombuchas', params: { 'fizziness': 'high', 'vegan': 'true', 'caffeine_free': 'true' }, headers: headers
 
           expect(response.status).to eq(200)
@@ -78,26 +79,56 @@ describe Api::KombuchasController, type: :request do
         end
       end
 
-      context 'Params of ingredient_name is provided:' do
-        let(:kom) { create(:kombucha, name: 'sample', fizziness_level: 'low', vegan: true, caffeine_free: true) }
-        let(:ing_name) { kom.ingredients.first.name }
+      context 'Filter by ingredient:' do
+        let(:common_ingredient) { Ingredient.where(base: false).order(Arel.sql("RANDOM()")).last }
+        let(:new_kombuchas) do
+          base_ingredients = Ingredient.where(base: true).order(Arel.sql("RANDOM()")).limit(5)
+          kombuchans = []
+          base_ingredients.each do |base|
+            ids = [base.id, common_ingredient.id]
+            ids << Ingredient.where.not(id: common_ingredient.id).where(base: false)
+                             .order(Arel.sql("RANDOM()")).limit(3).pluck(:id)
+            ingredients = Ingredient.where(id: ids.flatten)
+            kombucha = create(:kombucha, vegan: true, caffeine_free: true)
+            create(:rating, score: 3.5, user_id: current_user.id, kombucha_id: kombucha.id)
+            kombuchans << kombucha
+            kombucha.ingredients = ingredients
+            kombucha.save!
+          end
+        end
         let(:kombucha_count) { Kombucha.includes(:ingredients).where(ingredients: { name: ing_name }).count }
+        let(:ing_name) { common_ingredient.name }
 
-        it "renders a collection of kombuchas, which are filtered based on the ingredient provided" do
-          get '/api/kombuchas', params: { ingredient_name: ing_name }, headers: headers
-
+        it "renders a collection of kombuchas, which are filtered based on the given ingredient value" do
+          get '/api/kombuchas', params: { ingredient: ing_name }, headers: headers
+          expect(response_body.map {|kom| Kombucha.find(kom['id']).ingredients.pluck(:name).include?(common_ingredient.name)}.uniq).to eq([true])
           expect(response.status).to eq(200)
           expect(response_body.length).to eq(kombucha_count)
         end
       end
 
-      context 'Params of excluded ingredient_name is provided:' do
-        let(:kom) { create(:kombucha, name: 'sample', fizziness_level: 'low', vegan: true, caffeine_free: true) }
-        let(:exc_ing_name) { kom.ingredients.first.name }
+      context 'Filter by excluded ingredient:' do
+        let(:common_ingredient) { Ingredient.where(base: false).order(Arel.sql("RANDOM()")).last }
+        let(:new_kombuchas) do
+          base_ingredients = Ingredient.where(base: true).order(Arel.sql("RANDOM()")).limit(5)
+          kombuchans = []
+          base_ingredients.each do |base|
+            ids = [base.id, common_ingredient.id]
+            ids << Ingredient.where.not(id: common_ingredient.id).where(base: false)
+                             .order(Arel.sql("RANDOM()")).limit(3).pluck(:id)
+            ingredients = Ingredient.where(id: ids.flatten)
+            kombucha = create(:kombucha, vegan: true, caffeine_free: true)
+            create(:rating, score: 3.5, user_id: current_user.id, kombucha_id: kombucha.id)
+            kombuchans << kombucha
+            kombucha.ingredients = ingredients
+            kombucha.save!
+          end
+        end
+        let(:exc_ing_name) { common_ingredient.name }
         let(:kombucha_count) { Kombucha.includes(:ingredients).references(:ingredients).where.not(ingredients: { name: exc_ing_name }).count }
 
-        it "renders a collection of kombuchas, which are filtered by excluding the given ingredient" do
-          get '/api/kombuchas', params: { exclude_ingredient_name: exc_ing_name }, headers: headers
+        it "renders a collection of kombuchas, which are filtered by excluding the given ingredient value" do
+          get '/api/kombuchas', params: { excluded_ingredient: exc_ing_name }, headers: headers
 
           expect(response.status).to eq(200)
           expect(response_body.length).to eq(kombucha_count)
