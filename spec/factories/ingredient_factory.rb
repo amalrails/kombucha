@@ -2,7 +2,7 @@
 
 FactoryBot.define do
   factory :ingredient, class: Ingredient do
-    name { Faker::Food.unique.ingredient }
+    sequence(:name) { |n| Faker::Lorem.word + n.to_s }
     base { false }
     caffeine_free { false }
     vegan { false }
