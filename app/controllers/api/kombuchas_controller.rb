@@ -41,8 +41,7 @@ class Api::KombuchasController < ApiController
     end
 
     def kombucha_params
-      params.require(:kombucha).permit(:name, :fizziness_level,
-                                       ingredient: [:caffeine_free, :vegan])
+      params.require(:kombucha).permit(:name, :fizziness_level)
     end
 
     def filtering_params(params)
