@@ -51,6 +51,18 @@ describe Api::KombuchasController, type: :request do
         end
       end
 
+      context 'Filter by caffeine_free:' do
+        let(:kombucha_count) { Kombucha.includes(:ingredients)
+                                       .where(ingredients: { caffeine_free: 'true' }).count }
+
+        it "renders a collection of kombuchas, which are filtered based on the given vegan value" do
+          get '/api/kombuchas', params: { 'caffeine_free': 'true' }, headers: headers
+
+          expect(response.status).to eq(200)
+          expect(response_body.length).to eq(kombucha_count)
+        end
+      end
+
       context 'Filter by vegan and caffeine_free:' do
         let(:kombucha_count) { Kombucha.includes(:ingredients)
                                        .where(ingredients: { vegan: true,

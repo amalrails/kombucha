@@ -12,10 +12,23 @@ class Kombucha < ApplicationRecord
   scope :filter_by_vegan, -> (vegan) { includes(:ingredients).references(:ingredients)
                                        .where(ingredients: { vegan: vegan }) }
   scope :filter_by_caffeine_free, -> (caffeine) { includes(:ingredients).references(:ingredients)
-                                                  .where(ingredients: { vegan: caffeine }) }
-  scope :with_different_tea_base, -> { includes(:ingredients).references(:ingredients)
-                                                             .select('distinct *')
-                                                             .where(ingredients: { base: true }) }
+                                                  .where(ingredients: { caffeine_free: caffeine }) }
+  scope :with_different_tea_base, lambda do
+    kombuchas = includes(:ingredients).references(:ingredients).where(ingredients: { base: true })
+    base_hash = {}
+    kombucha_ids_to_reject = []
+    kombuchas.random_order.each do |kom|
+      base_ingredient_id = kom.ingredients.where(base: true).first.id
+      if base_hash.keys.include?(base_ingredient_id)
+        kombucha_ids_to_reject << kom.id
+      else
+        base_hash[base_ingredient_id] = true
+      end
+    end
+    kombuchas.reject_kombuchas(kombucha_ids_to_reject)
+  end
+
+  scope :reject_kombuchas, -> (ids) { where.not(id: ids) }
   scope :random_order, -> { order(Arel.sql("RANDOM()")) }
   scope :filter_by_recipe_name, -> (recipe_name) { where(name: recipe_name) }
   scope :filter_by_ingredient, -> (ingredient_name) {  includes(:ingredients)
