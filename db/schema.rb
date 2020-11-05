@@ -10,13 +10,15 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_10_31_134342) do
+ActiveRecord::Schema.define(version: 2020_11_05_002229) do
 
   create_table "flights", force: :cascade do |t|
     t.string "name"
     t.text "list"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["list"], name: "index_flights_on_list"
+    t.index ["name"], name: "index_flights_on_name"
   end
 
   create_table "ingredients", force: :cascade do |t|
@@ -26,11 +28,17 @@ ActiveRecord::Schema.define(version: 2020_10_31_134342) do
     t.boolean "vegan"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["base"], name: "index_ingredients_on_base"
+    t.index ["caffeine_free"], name: "index_ingredients_on_caffeine_free"
+    t.index ["name"], name: "index_ingredients_on_name"
+    t.index ["vegan"], name: "index_ingredients_on_vegan"
   end
 
   create_table "kombuchas", force: :cascade do |t|
     t.string "name"
     t.string "fizziness_level"
+    t.index ["fizziness_level"], name: "index_kombuchas_on_fizziness_level"
+    t.index ["name"], name: "index_kombuchas_on_name"
   end
 
   create_table "ratings", force: :cascade do |t|
@@ -40,6 +48,7 @@ ActiveRecord::Schema.define(version: 2020_10_31_134342) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["kombucha_id"], name: "index_ratings_on_kombucha_id"
+    t.index ["score"], name: "index_ratings_on_score"
     t.index ["user_id"], name: "index_ratings_on_user_id"
   end
 
@@ -56,6 +65,8 @@ ActiveRecord::Schema.define(version: 2020_10_31_134342) do
     t.string "email"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["email"], name: "index_users_on_email"
+    t.index ["name"], name: "index_users_on_name"
   end
 
 end
