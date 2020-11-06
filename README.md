@@ -1,4 +1,4 @@
-# Fullscript - Kombucha Builder
+Kombucha Builder
 
 Kombucha Builder is an API for creating and managing kombucha recipes.
 
